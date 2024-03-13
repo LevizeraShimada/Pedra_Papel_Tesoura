@@ -1,0 +1,90 @@
+import random
+import tkinter as tk
+
+root = tk.Tk()
+root.configure(bg='lightcyan')
+
+
+class Window(tk.Frame):
+    def __init__(self, master=None):
+        tk.Frame.__init__(self, master)
+        self.master = master
+
+
+def entry_up(text):
+    entry.delete(0, tk.END)
+    entry.insert(0, text)
+    return text
+
+
+jogadas = ['Pedra', 'Papel', 'Tesoura']
+pontos = [0, 0]
+
+entry = tk.Entry(root, width=30, bg='lightgrey', font=('Helvetica', 20))
+entry.pack(pady=10)
+
+
+def func(x):
+    global p1_j
+    p1_j = x
+    return entry_up(x)
+
+
+def countdown(time):
+    if time > 0:
+        timer.config(text=f"Fechando em {time} segundos\n", bg='lightcyan', font=('Helvetica', 10))
+        root.after(1000, countdown, time - 1)
+    else:
+        root.destroy()
+
+
+def disable_buttons():
+    for button in button_dict.values():
+        button.config(state='disabled')
+
+
+def game():
+    global pontos, p1_j
+    robo_j = random.choice(jogadas)
+    robo_choice.config(text=f"Robo escolheu: {robo_j}\n", bg='lightcyan', font=('Helvetica', 16))
+
+    if p1_j == robo_j:
+        result.config(text='Empate..    :/', bg='lightcyan', font=('Helvetica', 14))
+    elif (p1_j == "Pedra" and robo_j == 'Papel') or (p1_j == "Papel" and robo_j == 'Tesoura') or (
+            p1_j == "Tesoura" and robo_j == 'Pedra'):
+        pontos[1] += 1
+        result.config(text=f'Ponto para robo...    :(\nRobo agora esta com {pontos[1]} pontos e Voce com {pontos[0]}\n',
+                      bg='lightcyan', font=('Helvetica', 14))
+    else:
+        pontos[0] += 1
+        result.config(text=f'Ponto para voce!    :)\nVoce agora esta com {pontos[0]} pontos e Robo com {pontos[1]}\n',
+                      bg='lightcyan', font=('Helvetica', 14))
+    if pontos[1] == 3:
+        result.config(text='\nRobo Ganhou..   :(\nBoa sorte da proxima vez\n', bg='lightcyan', font=('Helvetica', 14))
+        disable_buttons()
+        countdown(10)
+    if pontos[0] == 3:
+        result.config(text='\nVoce Ganhou!   :)\nParabens!\n', bg='lightcyan', font=('Helvetica', 14))
+        disable_buttons()
+        countdown(10)
+
+
+if __name__ == '__main__':
+    button_dict = {}
+    for i in jogadas:
+        root.geometry('800x600')
+        app = Window(root)
+        root.wm_title("======Pedra, Papel, Tesoura======")
+        button_dict[i] = tk.Button(root, text=i, command=lambda s=i: (func(s), game()), width=20, height=3,
+                                   bg='lightblue', font=('Helvetica', 14))
+        button_dict[i].pack(padx=3, pady=10)
+    robo_choice = tk.Label(root, text="")
+    robo_choice.pack()
+    result = tk.Label(root, text="")
+    result.pack()
+    timer = tk.Label(root, text="")
+    timer.pack()
+
+    exitButton = tk.Button(root, text="Sair", bd='3', command=root.destroy, bg='red')
+    exitButton.pack(side='bottom', padx=10, pady=10)
+    root.mainloop()
